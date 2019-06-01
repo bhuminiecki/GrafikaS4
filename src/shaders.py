@@ -1,26 +1,29 @@
 vertex = """
 #version 330
-in vec3 position;
-in vec3 color;
 
-uniform mat4 transform;
+uniform mat4 P;
+uniform mat4 V;
+uniform mat4 M;
 
-out vec3 newColor;
-void main()
-{
-    gl_Position = transform * vec4(position, 1.0f);
-    newColor = color;
+in vec4 vertex;
+in vec4 color;
+in vec4 normal;
+
+out vec4 gColor;
+
+void main(void) {
+    gColor=color;
+    gl_Position=P*V*M*vertex;
 }
 """
 
 fragment = """
 #version 330
-in vec3 newColor;
 
-out vec4 outColor;
+out vec4 pixelColor;
+in vec4 iColor;
 
-void main()
-{
-    outColor = vec4(newColor, 1.0f);
+void main(void) {
+    pixelColor=iColor;
 }
 """

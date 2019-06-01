@@ -1,9 +1,10 @@
 import glfw
+import glm
 from OpenGL.GL import shaders
 from OpenGL.GL import *
 from OpenGL.GLU import *
-from src import drawer
 from src import shaders
+from src import cube
 
 aspect_ratio = 1
 sp = None
@@ -37,9 +38,35 @@ def draw_scene(window):
     global sp
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
-    glUseProgram(sp)
+    V = glm.lookAt(
+        glm.vec3(0.0, 0.0, -5.0),
+        glm.vec3(0.0, 0.0, 0.0),
+        glm.vec3(0.0, 1.0, 0.0)
+    )
 
-    drawer.cube()
+    P = glm.perspective(50.0*glm.pi()/180.0, aspect_ratio, 1.0, 50.0)
+
+    M = glm.mat4(1.0)
+
+    glUseProgram(sp)
+    glUniformMatrix4fv(glGetUniformLocation(sp, "V"), 1, False, glm.value_ptr(V))
+    glUniformMatrix4fv(glGetUniformLocation(sp, "P"), 1, False, glm.value_ptr(P))
+    glUniformMatrix4fv(glGetUniformLocation(sp, "M"), 1, False, glm.value_ptr(M))
+
+    glEnableVertexAttribArray(glGetAttribLocation(sp, "vertex"))
+    glVertexAttribPointer(glGetAttribLocation(sp, "vertex"), 4, GL_FLOAT, False, 0, cube.vertices)
+
+    glEnableVertexAttribArray(glGetAttribLocation(sp, "normal"))
+    glVertexAttribPointer(glGetAttribLocation(sp, "normal"), 4, GL_FLOAT, False, 0, cube.normals)
+
+    glEnableVertexAttribArray(glGetAttribLocation(sp, "color"))
+    glVertexAttribPointer(glGetAttribLocation(sp, "color"), 4, GL_FLOAT, False, 0, cube.colors)
+
+    glDrawArrays(GL_TRIANGLES, 0, cube.vertexcount)
+
+    glDisableVertexAttribArray(glGetAttribLocation(sp, "vertex"))
+    glDisableVertexAttribArray(glGetAttribLocation(sp, "normal"))
+    glDisableVertexAttribArray(glGetAttribLocation(sp, "color"))
 
     glfw.swap_buffers(window)
 
